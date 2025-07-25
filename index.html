@@ -8,30 +8,39 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f4f4f4;
+      background: #121212;
+      color: #f4f4f4;
     }
     h1 {
       text-align: center;
+      color: #ff3c00;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #fff;
+      background: #1e1e1e;
+      margin-top: 20px;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
+      border: 1px solid #444;
+      padding: 10px;
       text-align: center;
     }
     th {
-      background-color: #333;
-      color: white;
+      background-color: #272727;
+      color: #ff3c00;
     }
     .right {
-      background-color: #c8e6c9;
+      background-color: #2e7d32;
+      color: #fff;
     }
     .wrong {
-      background-color: #ffcdd2;
+      background-color: #c62828;
+      color: #fff;
+    }
+    .unknown {
+      background-color: #616161;
+      color: #fff;
     }
   </style>
 </head>
@@ -41,7 +50,7 @@
 
   <script>
     const SHEET_ID = "18zP4cKZjscW06j5ucquKiwKe5y74U6QiobEE6QC1VhU";
-    const GID = "676240079"; // Your Sheet tab gid
+    const GID = "676240079";
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
     fetch(URL)
@@ -61,7 +70,10 @@
           html += '<tr>';
           row.c.forEach(cell => {
             const val = cell ? cell.v : "";
-            const className = val === "RIGHT" ? "right" : val === "WRONG" ? "wrong" : "";
+            let className = "";
+            if (val === "RIGHT") className = "right";
+            else if (val === "WRONG") className = "wrong";
+            else if (val === "PENDING") className = "unknown";
             html += `<td class="${className}">${val}</td>`;
           });
           html += '</tr>';
