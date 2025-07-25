@@ -25,7 +25,7 @@
   <button onclick="submitPicks()">Submit Picks</button>
 
   <script>
-    const sheetAPI = 'YOUR_SCRIPT_WEB_APP_URL'; // replace with your deployed Apps Script URL
+    const sheetAPI = 'https://script.google.com/macros/s/AKfycbza6acSx7uA8Rdm_pNY_kCl4v2_okkcRyCxae38Y59BRfKw6dWzaMUZiKNrbqIWp7baWg/exec'; // replace with your deployed Apps Script URL
 
     async function loadFights() {
       const res = await fetch(sheetAPI + '?action=getFights');
