@@ -3,36 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UFC Picks Leaderboard</title>
+  <title>UFC Picks</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
       background: #0d0d0d;
       color: #f4f4f4;
+      margin: 0;
+      padding: 0;
     }
-    h1 {
+    header {
+      background-color: #1e1e1e;
+      padding: 20px;
       text-align: center;
+      border-bottom: 2px solid #ff3c00;
+    }
+    header h1 {
+      margin: 0;
       color: #ff3c00;
-      margin-bottom: 10px;
     }
-    .description {
-      text-align: center;
-      color: #bbb;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-    .leaderboard-container {
-      max-width: 1000px;
-      margin: 0 auto;
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #1e1e1e;
       border-radius: 10px;
-      overflow: hidden;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .fight-picker {
+      margin-bottom: 30px;
+    }
+    label, select {
+      display: block;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    select {
+      padding: 10px;
+      background-color: #272727;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #ff3c00;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #e63600;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #1e1e1e;
+      margin-top: 30px;
     }
     th, td {
       border: 1px solid #333;
@@ -42,39 +70,61 @@
     th {
       background-color: #272727;
       color: #ff3c00;
-      position: sticky;
-      top: 0;
-      z-index: 1;
     }
     .right {
       background-color: #2e7d32;
-      color: #fff;
     }
     .wrong {
       background-color: #c62828;
-      color: #fff;
     }
     .unknown {
       background-color: #616161;
-      color: #fff;
     }
-    .footer {
-      margin-top: 30px;
+    footer {
       text-align: center;
       font-size: 12px;
+      padding: 20px;
       color: #777;
     }
   </style>
 </head>
 <body>
-  <h1>UFC Picks Leaderboard</h1>
-  <div class="description">Live scoring updates pulled from Google Sheets</div>
-  <div class="leaderboard-container">
-    <div id="tableContainer">Loading picks...</div>
-  </div>
-  <div class="footer">Made for fun. UFC trademarks belong to their respective owners.</div>
+  <header>
+    <h1>UFC Picks</h1>
+  </header>
+  <main>
+    <section class="fight-picker">
+      <h2>Pick Your Fighters</h2>
+      <label for="fight1">Fight 1:</label>
+      <select id="fight1">
+        <option value="">-- Choose a fighter --</option>
+        <option value="Fighter A">Fighter A</option>
+        <option value="Fighter B">Fighter B</option>
+      </select>
+
+      <label for="fight2">Fight 2:</label>
+      <select id="fight2">
+        <option value="">-- Choose a fighter --</option>
+        <option value="Fighter C">Fighter C</option>
+        <option value="Fighter D">Fighter D</option>
+      </select>
+
+      <button onclick="submitPicks()">Submit Picks</button>
+    </section>
+
+    <div id="tableContainer">Loading leaderboard...</div>
+  </main>
+  <footer>
+    Made for fun. UFC trademarks belong to their respective owners.
+  </footer>
 
   <script>
+    function submitPicks() {
+      const fight1 = document.getElementById('fight1').value;
+      const fight2 = document.getElementById('fight2').value;
+      alert(`Your picks submitted:\nFight 1: ${fight1}\nFight 2: ${fight2}`);
+    }
+
     const SHEET_ID = "18zP4cKZjscW06j5ucquKiwKe5y74U6QiobEE6QC1VhU";
     const GID = "676240079";
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
