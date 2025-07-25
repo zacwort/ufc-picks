@@ -5,163 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UFC Picks</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #1e1e1e;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 2px solid #ff3c00;
-    }
-    header h1 {
-      margin: 0;
-      color: #ff3c00;
-    }
-    main {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 20px;
-      background: #1e1e1e;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    }
-    .fight-picker {
-      margin-bottom: 30px;
-    }
-    label, select {
-      display: block;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    select {
-      padding: 10px;
-      background-color: #272727;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #ff3c00;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #e63600;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #272727;
-      color: #ff3c00;
-    }
-    .right {
-      background-color: #2e7d32;
-    }
-    .wrong {
-      background-color: #c62828;
-    }
-    .unknown {
-      background-color: #616161;
-    }
-    footer {
-      text-align: center;
-      font-size: 12px;
-      padding: 20px;
-      color: #777;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    h1 { text-align: center; }
+    .fight { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+    select { padding: 5px; margin-top: 5px; width: 100%; }
+    button { padding: 10px 20px; margin-top: 20px; font-size: 16px; }
+    label { display: block; font-weight: bold; margin-top: 15px; }
+    input[type="text"] { padding: 8px; width: 100%; margin-top: 5px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>UFC Picks</h1>
-  </header>
-  <main>
-    <section class="fight-picker">
-      <h2>Pick Your Fighters</h2>
-      <label for="fight1">Fight 1:</label>
-      <select id="fight1">
-        <option value="">-- Choose a fighter --</option>
-        <option value="Fighter A">Fighter A</option>
-        <option value="Fighter B">Fighter B</option>
-      </select>
+  <h1>UFC Picks</h1>
 
-      <label for="fight2">Fight 2:</label>
-      <select id="fight2">
-        <option value="">-- Choose a fighter --</option>
-        <option value="Fighter C">Fighter C</option>
-        <option value="Fighter D">Fighter D</option>
-      </select>
+  <label for="username">Enter Your Name</label>
+  <input type="text" id="username" placeholder="Your name or nickname" />
 
-      <button onclick="submitPicks()">Submit Picks</button>
-    </section>
+  <div id="fights"></div>
 
-    <div id="tableContainer">Loading leaderboard...</div>
-  </main>
-  <footer>
-    Made for fun. UFC trademarks belong to their respective owners.
-  </footer>
+  <button onclick="submitPicks()">Submit Picks</button>
 
   <script>
-    function submitPicks() {
-      const fight1 = document.getElementById('fight1').value;
-      const fight2 = document.getElementById('fight2').value;
-      alert(`Your picks submitted:\nFight 1: ${fight1}\nFight 2: ${fight2}`);
+    const sheetAPI = 'YOUR_SCRIPT_WEB_APP_URL'; // replace with your deployed Apps Script URL
+
+    async function loadFights() {
+      const res = await fetch(sheetAPI + '?action=getFights');
+      const data = await res.json();
+      const container = document.getElementById('fights');
+
+      data.forEach((fight, index) => {
+        const div = document.createElement('div');
+        div.className = 'fight';
+        div.innerHTML = `
+          <label for="fight${index}">${fight.fighterA} vs ${fight.fighterB}</label>
+          <select id="fight${index}">
+            <option value="">-- Choose winner --</option>
+            <option value="${fight.fighterA}">${fight.fighterA}</option>
+            <option value="${fight.fighterB}">${fight.fighterB}</option>
+          </select>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    const SHEET_ID = "18zP4cKZjscW06j5ucquKiwKe5y74U6QiobEE6QC1VhU";
-    const GID = "676240079";
-    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+    async function submitPicks() {
+      const username = document.getElementById('username').value.trim();
+      if (!username) return alert('Please enter your name.');
 
-    fetch(URL)
-      .then(res => res.text())
-      .then(data => {
-        const json = JSON.parse(data.substring(47).slice(0, -2));
-        const rows = json.table.rows;
-        const cols = json.table.cols;
+      const selects = document.querySelectorAll('select');
+      const picks = Array.from(selects).map(s => s.value);
 
-        let html = '<table><thead><tr>';
-        cols.forEach(col => {
-          html += `<th>${col.label || ""}</th>`;
-        });
-        html += '</tr></thead><tbody>';
+      if (picks.some(p => !p)) return alert('Please make all picks.');
 
-        rows.forEach(row => {
-          html += '<tr>';
-          row.c.forEach(cell => {
-            const val = cell ? cell.v : "";
-            let className = "";
-            if (val === "RIGHT") className = "right";
-            else if (val === "WRONG") className = "wrong";
-            else if (val === "PENDING") className = "unknown";
-            html += `<td class="${className}">${val}</td>`;
-          });
-          html += '</tr>';
-        });
-
-        html += '</tbody></table>';
-        document.getElementById("tableContainer").innerHTML = html;
-      })
-      .catch(err => {
-        document.getElementById("tableContainer").innerText = "Failed to load data.";
-        console.error(err);
+      const res = await fetch(sheetAPI, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'submitPicks', user: username, picks }),
+        headers: { 'Content-Type': 'application/json' }
       });
+
+      const result = await res.text();
+      alert(result);
+    }
+
+    loadFights();
   </script>
 </body>
 </html>
